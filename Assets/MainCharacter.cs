@@ -7,15 +7,19 @@ public class MainCharacter : MonoBehaviour
 
     private Rigidbody rigidBody;
     public static float speed = 500f;
-    private static float thrust = 1f;
+    public float thrust = 2f;
     private Transform moonTransform;
-    private float altitude;
+    public float altitude;
     public float horizontalSpeed = 0.1f;
     public float verticalSpeedNew;
     public bool isThrusting;
     public float verticalSpeed = -0.0000000000001f;
     private float nextSecond;
-    private bool isDestroyed = false;
+    public bool isTouchingMoon = false;
+    public static float MAXIMUM_SPEED_FOR_BEST_LANDING = 20f;
+    public static float MAXIMUM_SPEED_FOR_OK_LANDING = 35f;
+    public static float MAXIMUM_SPEED_FOR_WORST_LANDING = 50f;
+
 
     // Start is called before the first frame update
     void Start()
@@ -36,7 +40,7 @@ public class MainCharacter : MonoBehaviour
 
 
         updateAltitude();
-        
+
         if (Input.GetKey(KeyCode.RightArrow))
         {
             rigidBody.AddTorque(new Vector3(0, 0, -speed) * Time.deltaTime);
@@ -49,7 +53,7 @@ public class MainCharacter : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space))
         {
-            
+
             rigidBody.AddRelativeForce(new Vector3(0, 0, 1) * thrust);
         }
 
@@ -64,23 +68,37 @@ public class MainCharacter : MonoBehaviour
 
     void updateAltitude()
     {
-        this.altitude = Vector3.Distance(transform.position, moonTransform.position);
+        RaycastHit hit;
+        Ray downRay = new Ray(transform.position, -Vector3.up);
+
+        if (Physics.Raycast(downRay, out hit))
+        {
+            this.altitude = hit.distance;
+        }
+
+        //this.altitude = Vector3.Distance(transform.position, moonTransform.position);
     }
 
-    void setVelocity (float horizontalSpeed, float verticalSpeed)
+    public bool CloseToGround ()
     {
+        return this.altitude <= 3f;
+    }
+
+    void setVelocity(float horizontalSpeed, float verticalSpeed)
+    { 
         this.rigidBody.velocity = new Vector3(horizontalSpeed, verticalSpeed, 0);
     }
 
     void OnCollisionEnter (Collision collision)
     {
-
-        Debug.Log("Something touched me");
-        Debug.Log(collision.gameObject.tag);
-        Debug.Log(collision.gameObject.name);
         if (collision.gameObject.tag == "Moon")
         {
-            isDestroyed = true;
+            isTouchingMoon = true;
         }
+    }
+
+    public bool LandedSafely ()
+    {
+        return isTouchingMoon;
     }
 }
