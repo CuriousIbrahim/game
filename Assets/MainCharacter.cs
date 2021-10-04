@@ -19,6 +19,8 @@ public class MainCharacter : MonoBehaviour
     public static float MAXIMUM_SPEED_FOR_BEST_LANDING = 20f;
     public static float MAXIMUM_SPEED_FOR_OK_LANDING = 35f;
     public static float MAXIMUM_SPEED_FOR_WORST_LANDING = 50f;
+    public bool isDestroyed = false;
+    private int score = 0;
 
 
     // Start is called before the first frame update
@@ -94,11 +96,44 @@ public class MainCharacter : MonoBehaviour
         if (collision.gameObject.tag == "Moon")
         {
             isTouchingMoon = true;
+
+            if (this.verticalSpeed > MAXIMUM_SPEED_FOR_WORST_LANDING)
+            {
+                isDestroyed = true;
+            }
+
+            score += 50;
+            Application.LoadLevel(Application.loadedLevel);
         }
     }
 
     public bool LandedSafely ()
     {
-        return isTouchingMoon;
+        return isTouchingMoon && !isDestroyed;
+    }
+    
+    public bool IsDestroyed ()
+    {
+        return isDestroyed;
+    }
+
+    public float getVerticalSpeed()
+    {
+        return this.verticalSpeed;
+    }
+
+    public float getHorizontalSpeed()
+    {
+        return this.horizontalSpeed;
+    }
+
+    public float getAltitude()
+    {
+        return this.altitude * 10;
+    }
+
+    public int getScore()
+    {
+        return score;
     }
 }
