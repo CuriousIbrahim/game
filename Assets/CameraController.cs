@@ -5,6 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public Transform lookAt;
+    public MainCharacter player;
 
     public float speed = 0.15f;
 
@@ -15,7 +16,12 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate ()
     {
+        if (player.IsDestroyed()) {
+            return;
+        }
+
         Vector3 delta = Vector3.zero;
+
 
         float dx = lookAt.position.x - transform.position.x;
 
