@@ -61,7 +61,7 @@ public class ImportantState : MonoBehaviour
 
     public void decrementFuel ()
     {
-        fuel -= 0.01;
+        fuel -= 0.1;
     }
 
     public string getTime()

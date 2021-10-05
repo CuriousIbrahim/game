@@ -26,6 +26,7 @@ public class MainCharacter : MonoBehaviour
     public float verticalSpeedAtCollision;
     public float nextTimeUpdateIfCrash;
     public UIInfoUpdater uIInfoUpdater;
+    private bool isStop = false;
 
 
     // Start is called before the first frame update
@@ -46,7 +47,7 @@ public class MainCharacter : MonoBehaviour
             this.altitude = hit.distance;
         }
 
-        setVelocity(1f, 0f);
+        setVelocity(0.3f, 0f);
 
         stateTrack.setActive(true);
     }
@@ -59,6 +60,8 @@ public class MainCharacter : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        isStop = isTouchingMoon | isStop;
+
         if (isDestroyed && Time.time > nextTimeUpdateIfCrash)
         {
             if (stateTrack.getFuel() <= 0)
@@ -80,27 +83,27 @@ public class MainCharacter : MonoBehaviour
         updateAltitude();
         updateIsUpright();
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) && !isStop)
         {
             rigidBody.AddTorque(new Vector3(speed, 0, 0) * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) && !isStop)
         {
             rigidBody.AddTorque(new Vector3(-speed, 0, 0) * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.UpArrow) && stateTrack.getFuel() > 0)
+        if (Input.GetKey(KeyCode.UpArrow) && stateTrack.getFuel() > 0 && !isStop)
         {
             Debug.Log(rigidBody);
             stateTrack.decrementFuel();
             rigidBody.AddRelativeForce(new Vector3(0, 1, 0) * thrust);
         }
 
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+        if (Input.GetKeyDown(KeyCode.UpArrow) && !isStop)
         {
             isThrusting = true;
-        } else if (Input.GetKeyUp(KeyCode.UpArrow))
+        } else if (Input.GetKeyUp(KeyCode.UpArrow) && !isStop)
         {
             isThrusting = false;
         }
