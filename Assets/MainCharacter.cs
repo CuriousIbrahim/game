@@ -20,7 +20,12 @@ public class MainCharacter : MonoBehaviour
     public static float MAXIMUM_SPEED_FOR_OK_LANDING = 35f;
     public static float MAXIMUM_SPEED_FOR_WORST_LANDING = 50f;
     public bool isDestroyed = false;
-    private int score = 0;
+    public bool isUpright = false;
+    private ImportantState stateTrack;
+    public static float thresholdForBeingUpright = 0.6f;
+    public float verticalSpeedAtCollision;
+    public float nextTimeUpdateIfCrash;
+    public UIInfoUpdater uIInfoUpdater;
 
 
     // Start is called before the first frame update
@@ -31,16 +36,23 @@ public class MainCharacter : MonoBehaviour
         nextSecond = Time.time + 1;
         verticalSpeedNew = 0;
         isThrusting = false;
+        stateTrack = GameObject.Find("StateTrack").GetComponent<ImportantState>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (isDestroyed && Time.time > nextTimeUpdateIfCrash)
+        {
+            Application.LoadLevel(Application.loadedLevel);
+        }
+
         horizontalSpeed = rigidBody.velocity.x * 100;
         verticalSpeed = rigidBody.velocity.y * 100;
 
 
         updateAltitude();
+        updateIsUpright();
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
@@ -52,9 +64,9 @@ public class MainCharacter : MonoBehaviour
             rigidBody.AddTorque(new Vector3(0, 0, speed) * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space) && stateTrack.getFuel() > 0)
         {
-
+            stateTrack.decrementFuel();
             rigidBody.AddRelativeForce(new Vector3(0, 0, 1) * thrust);
         }
 
@@ -65,6 +77,13 @@ public class MainCharacter : MonoBehaviour
         {
             isThrusting = false;
         }
+    }
+
+    void updateIsUpright()
+    {
+
+        float track = Vector2.Dot(transform.forward, Vector3.up);
+        isUpright = track > 0.98f;
     }
 
     void updateAltitude()
@@ -94,21 +113,24 @@ public class MainCharacter : MonoBehaviour
     {
         if (collision.gameObject.tag == "Moon")
         {
+            verticalSpeedAtCollision = verticalSpeed;
             isTouchingMoon = true;
 
-            if (this.verticalSpeed > MAXIMUM_SPEED_FOR_WORST_LANDING)
-            {
-                isDestroyed = true;
-            }
+            Debug.Log("ha " + verticalSpeedAtCollision + " " + (verticalSpeedAtCollision > MAXIMUM_SPEED_FOR_WORST_LANDING) + " "  + !isUpright);
 
-            score += 50;
-            Application.LoadLevel(Application.loadedLevel);
+            if (Mathf.Abs(verticalSpeedAtCollision) > MAXIMUM_SPEED_FOR_WORST_LANDING && !isUpright)
+            {
+                Debug.Log("ouch");
+                isDestroyed = true;
+                uIInfoUpdater.CrashingLandingMessage();
+                nextTimeUpdateIfCrash = Time.time + 3f;
+            }
         }
     }
 
     public bool LandedSafely ()
     {
-        return isTouchingMoon && !isDestroyed;
+        return isTouchingMoon && !isDestroyed && isUpright;
     }
     
     public bool IsDestroyed ()
@@ -131,8 +153,8 @@ public class MainCharacter : MonoBehaviour
         return this.altitude * 10;
     }
 
-    public int getScore()
+    public float getVerticalSpeedAtCollision()
     {
-        return score;
+        return verticalSpeedAtCollision;
     }
 }
