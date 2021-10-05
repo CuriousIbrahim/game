@@ -21,8 +21,6 @@ public class MainCharacter : MonoBehaviour
     public static float MAXIMUM_SPEED_FOR_WORST_LANDING = 50f;
     public bool isDestroyed = false;
     private int score = 0;
-    public float startVerticalSpeed = -0.1f;
-    public float startHorizontalSpeed = 0.8f;
 
 
     // Start is called before the first frame update
@@ -30,9 +28,6 @@ public class MainCharacter : MonoBehaviour
     {
         rigidBody = GetComponent<Rigidbody>();
         moonTransform = GameObject.Find("MOON").transform;
-        setVelocity(startVerticalSpeed, startHorizontalSpeed);
-        horizontalSpeed = startHorizontalSpeed * 100;
-        verticalSpeed = rigidBody.velocity.y * 100;
         nextSecond = Time.time + 1;
         verticalSpeedNew = 0;
         isThrusting = false;
