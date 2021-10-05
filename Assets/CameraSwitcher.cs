@@ -17,8 +17,6 @@ public class CameraSwitcher : MonoBehaviour
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 
         canvas.worldCamera = farCamera.gameObject.GetComponent<Camera>();
-        farCamera.gameObject.SetActive(true);
-        closeCamera.gameObject.SetActive(false);
         farCamera.enabled = true;
         closeCamera.enabled = false;
     }
@@ -29,15 +27,11 @@ public class CameraSwitcher : MonoBehaviour
         if (player.CloseToGround())
         {
             canvas.worldCamera = closeCamera;
-            farCamera.gameObject.SetActive(false);
-            closeCamera.gameObject.SetActive(true);
             farCamera.enabled = false;
             closeCamera.enabled = true;
         } else
         {
             canvas.worldCamera = farCamera;
-            farCamera.gameObject.SetActive(true);
-            closeCamera.gameObject.SetActive(false);
             farCamera.enabled = true;
             closeCamera.enabled = false;
         }
