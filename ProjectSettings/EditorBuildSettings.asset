@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/FirstGame yo.unity
     guid: 06c405a44806b434da7819e1867aa9af
+  - enabled: 1
+    path: Assets/Scenes/Prologue.unity
+    guid: cc09fe682e9b23f47a499d84f4751f10
   m_configObjects: {}
