@@ -6,16 +6,19 @@ public class ImportantState : MonoBehaviour
 {
     private static bool _created = false;
 
+    private static double STARTING_FUEL = 500;
+
     private int score;
     private double fuel;
     private int minutes;
     private int seconds;
+    private bool isActive;
 
     // Start is called before the first frame update
     void Start()
     {
         score = 0;
-        fuel = 1000f;
+        fuel = STARTING_FUEL;
         minutes = 0;
         seconds = 0;
     }
@@ -33,9 +36,20 @@ public class ImportantState : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float time = Time.time;
-        minutes = (int) time / 60;
-        seconds = (int) time % 60; 
+        if (isActive)
+        {
+            float time = Time.time;
+            minutes = (int)time / 60;
+            seconds = (int)time % 60;
+        }
+    }
+
+    public void Reset()
+    {
+        score = 0;
+        fuel = STARTING_FUEL;
+        minutes = 0;
+        seconds = 0;
     }
 
     public void addToScore (int scoreToAdd)
@@ -63,5 +77,10 @@ public class ImportantState : MonoBehaviour
     public int getScore()
     {
         return score;
+    }
+
+    public void setActive(bool fuck)
+    {
+        isActive = fuck;
     }
 }

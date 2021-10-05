@@ -43,9 +43,17 @@ public class MainCharacter : MonoBehaviour
 
         if (Physics.Raycast(downRay, out hit))
         {
-
             this.altitude = hit.distance;
         }
+
+        setVelocity(1f, 0f);
+
+        stateTrack.setActive(true);
+    }
+
+    void Awake()
+    {
+
     }
 
     // Update is called once per frame
@@ -53,7 +61,16 @@ public class MainCharacter : MonoBehaviour
     {
         if (isDestroyed && Time.time > nextTimeUpdateIfCrash)
         {
-            Application.LoadLevel(Application.loadedLevel);
+            if (stateTrack.getFuel() <= 0)
+            {
+                Application.LoadLevel("MainMenu");
+                //stateTrack.setActive(false);
+                stateTrack.Reset();
+            } else
+            {
+                Application.LoadLevel(Application.loadedLevel);
+            }
+                
         }
 
         horizontalSpeed = rigidBody.velocity.x * 100;
@@ -139,7 +156,6 @@ public class MainCharacter : MonoBehaviour
 
             if (Mathf.Abs(verticalSpeedAtCollision) > MAXIMUM_SPEED_FOR_WORST_LANDING || !isUpright)
             {
-                Debug.Log("ouch");
                 isDestroyed = true;
                 uIInfoUpdater.CrashingLandingMessage();
 
