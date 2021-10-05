@@ -7,7 +7,7 @@ public class LandingPoint : MonoBehaviour
     public float distanceFromPlayer;
     private MainCharacter playerS;
     private GameObject playerGO;
-    public float maximumDistanceFromPlayerToBeConsideredForScore;
+    private float maximumDistanceFromPlayerToBeConsideredForScore = 0.4f;
     private bool ranOnce = false;
     private ImportantState stateTrack;
     public int multiplier;
@@ -18,7 +18,7 @@ public class LandingPoint : MonoBehaviour
     // Start is called before the first f+rame update
     void Start()
     {
-        playerGO = GameObject.Find("AircraftWhole");
+        playerGO = GameObject.Find("Aircraft");
         playerS = playerGO.GetComponent<MainCharacter>();
         uIInfoUpdater = GameObject.Find("UI-Updater").GetComponent<UIInfoUpdater>();
         stateTrack = GameObject.Find("StateTrack").GetComponent<ImportantState>();

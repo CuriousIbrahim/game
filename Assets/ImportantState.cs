@@ -15,7 +15,7 @@ public class ImportantState : MonoBehaviour
     void Start()
     {
         score = 0;
-        fuel = 4000f;
+        fuel = 1000f;
         minutes = 0;
         seconds = 0;
     }

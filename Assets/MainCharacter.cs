@@ -6,7 +6,7 @@ public class MainCharacter : MonoBehaviour
 {
 
     private Rigidbody rigidBody;
-    public static float speed = 500f;
+    public float speed = 500f;
     public float thrust = 2f;
     private Transform moonTransform;
     public float altitude;
@@ -37,6 +37,15 @@ public class MainCharacter : MonoBehaviour
         verticalSpeedNew = 0;
         isThrusting = false;
         stateTrack = GameObject.Find("StateTrack").GetComponent<ImportantState>();
+
+        RaycastHit hit;
+        Ray downRay = new Ray(transform.position, -Vector3.up);
+
+        if (Physics.Raycast(downRay, out hit))
+        {
+
+            this.altitude = hit.distance;
+        }
     }
 
     // Update is called once per frame
@@ -56,18 +65,19 @@ public class MainCharacter : MonoBehaviour
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            rigidBody.AddTorque(new Vector3(0, 0, -speed) * Time.deltaTime);
+            rigidBody.AddTorque(new Vector3(speed, 0, 0) * Time.deltaTime);
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            rigidBody.AddTorque(new Vector3(0, 0, speed) * Time.deltaTime);
+            rigidBody.AddTorque(new Vector3(-speed, 0, 0) * Time.deltaTime);
         }
 
         if (Input.GetKey(KeyCode.Space) && stateTrack.getFuel() > 0)
         {
+            Debug.Log(rigidBody);
             stateTrack.decrementFuel();
-            rigidBody.AddRelativeForce(new Vector3(0, 0, 1) * thrust);
+            rigidBody.AddRelativeForce(new Vector3(0, 1, 0) * thrust);
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -82,18 +92,29 @@ public class MainCharacter : MonoBehaviour
     void updateIsUpright()
     {
 
-        float track = Vector2.Dot(transform.forward, Vector3.up);
-        isUpright = track > 0.98f;
+        float track = Vector2.Dot(transform.up, Vector3.up);
+        isUpright = track > 0.95f;
     }
 
     void updateAltitude()
     {
-        RaycastHit hit;
-        Ray downRay = new Ray(transform.position, -Vector3.up);
+        //this.altitude = Vector3.Distance(transform.position, moonTransform.position);
 
-        if (Physics.Raycast(downRay, out hit))
+        Transform sphereTransform = GameObject.Find("Sphere").transform;
+
+       Debug.DrawRay(sphereTransform.position, -Vector3.up * 50);
+
+       RaycastHit hit;
+       Ray downRay = new Ray(sphereTransform.position, -Vector3.up);
+
+        int layerMask = 1 << 6;
+
+       if (Physics.Raycast(downRay, out hit, Mathf.Infinity, layerMask))
         {
-            this.altitude = hit.distance;
+            //Debug.Log(hit.distance);
+            Debug.Log(hit.transform.gameObject.name);
+            this.altitude = Vector3.Distance(sphereTransform.position, hit.point);
+
         }
 
         //this.altitude = Vector3.Distance(transform.position, moonTransform.position);
@@ -101,7 +122,7 @@ public class MainCharacter : MonoBehaviour
 
     public bool CloseToGround ()
     {
-        return this.altitude <= 3f;
+        return this.altitude <= 2f;
     }
 
     void setVelocity(float horizontalSpeed, float verticalSpeed)
@@ -116,13 +137,22 @@ public class MainCharacter : MonoBehaviour
             verticalSpeedAtCollision = verticalSpeed;
             isTouchingMoon = true;
 
-            Debug.Log("ha " + verticalSpeedAtCollision + " " + (verticalSpeedAtCollision > MAXIMUM_SPEED_FOR_WORST_LANDING) + " "  + !isUpright);
-
-            if (Mathf.Abs(verticalSpeedAtCollision) > MAXIMUM_SPEED_FOR_WORST_LANDING && !isUpright)
+            if (Mathf.Abs(verticalSpeedAtCollision) > MAXIMUM_SPEED_FOR_WORST_LANDING || !isUpright)
             {
                 Debug.Log("ouch");
                 isDestroyed = true;
                 uIInfoUpdater.CrashingLandingMessage();
+
+                GameObject[] shipParts = GameObject.FindGameObjectsWithTag("RocketShipPart");
+
+                foreach (GameObject shipPart in shipParts)
+                {
+                    Rigidbody gameObjectsRigidBody = shipPart.AddComponent<Rigidbody>();
+                    gameObjectsRigidBody.mass = 10;
+                    gameObjectsRigidBody.useGravity = true;
+
+                }
+
                 nextTimeUpdateIfCrash = Time.time + 3f;
             }
         }
@@ -150,7 +180,7 @@ public class MainCharacter : MonoBehaviour
 
     public float getAltitude()
     {
-        return this.altitude * 10;
+        return this.altitude * 50;
     }
 
     public float getVerticalSpeedAtCollision()
