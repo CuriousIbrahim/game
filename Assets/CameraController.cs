@@ -14,7 +14,7 @@ public class CameraController : MonoBehaviour
 
     private Vector3 desiredPosition;
 
-    private void LateUpdate ()
+    private void FixedUpdate ()
     {
         if (player.IsDestroyed()) {
             return;

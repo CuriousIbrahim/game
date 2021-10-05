@@ -57,7 +57,7 @@ public class MainCharacter : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (isDestroyed && Time.time > nextTimeUpdateIfCrash)
         {
@@ -90,17 +90,17 @@ public class MainCharacter : MonoBehaviour
             rigidBody.AddTorque(new Vector3(-speed, 0, 0) * Time.deltaTime);
         }
 
-        if (Input.GetKey(KeyCode.Space) && stateTrack.getFuel() > 0)
+        if (Input.GetKey(KeyCode.UpArrow) && stateTrack.getFuel() > 0)
         {
             Debug.Log(rigidBody);
             stateTrack.decrementFuel();
             rigidBody.AddRelativeForce(new Vector3(0, 1, 0) * thrust);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             isThrusting = true;
-        } else if (Input.GetKeyUp(KeyCode.Space))
+        } else if (Input.GetKeyUp(KeyCode.UpArrow))
         {
             isThrusting = false;
         }
@@ -156,6 +156,7 @@ public class MainCharacter : MonoBehaviour
 
             if (Mathf.Abs(verticalSpeedAtCollision) > MAXIMUM_SPEED_FOR_WORST_LANDING || !isUpright)
             {
+                GetComponents<AudioSource>()[0].Play();
                 isDestroyed = true;
                 uIInfoUpdater.CrashingLandingMessage();
 
@@ -170,6 +171,9 @@ public class MainCharacter : MonoBehaviour
                 }
 
                 nextTimeUpdateIfCrash = Time.time + 3f;
+            } else
+            {
+                GetComponents<AudioSource>()[1].Play();
             }
         }
     }
