@@ -11,21 +11,35 @@ public class UIInfoUpdater : MonoBehaviour
     public Text altitudeText;
     public Text horizontalSpeedText;
     public Text verticalSpeedText;
+    public Text messageText;
+    private ImportantState stateTrack;
 
     public MainCharacter player;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        stateTrack = GameObject.Find("StateTrack").GetComponent<ImportantState>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        horizontalSpeedText.text = "" + player.getHorizontalSpeed();
-        verticalSpeedText.text = "" + player.getVerticalSpeed();
-        altitudeText.text = "" + player.getAltitude();
-        scoreText.text = "" + player.getScore();
+        horizontalSpeedText.text = "" + (int) player.getHorizontalSpeed();
+        verticalSpeedText.text = "" + (int) player.getVerticalSpeed();
+        altitudeText.text = "" + (int) player.getAltitude();
+        scoreText.text = "" + stateTrack.getScore();
+        fuelText.text= "" + stateTrack.getFuel();
+        timeText.text = stateTrack.getTime();
+    }
+
+    public void SuccessLandingMessage(int points)
+    {
+        messageText.text = "You landed alive!\n" + points + " points!";
+    }
+
+    public void CrashingLandingMessage()
+    {
+        messageText.text = "You crashed!";
     }
 }
